@@ -31,18 +31,22 @@ class Graph {
   printDependencyOrdering() {
     const inDegrees = { ...this.inDegrees }
 
+    const solution = []
+
     while (Object.keys(inDegrees).length) {
       const first = Object.keys(inDegrees)
         .filter(key => inDegrees[key] === 0)
         .sort()[0]
 
-      console.log(first)
+      solution.push(first)
 
       delete inDegrees[first]
 
       const neighbors = this.adjacencyList.get(first)
       neighbors.forEach(neighbor => inDegrees[neighbor]--)
     }
+
+    console.log(solution.join(''))
   }
 }
 
