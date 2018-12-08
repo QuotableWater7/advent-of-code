@@ -2,29 +2,31 @@
 
 const fs = require('fs')
 
-const calculateMetadataSum = numbers => {
-  const [numChildNodes, numMetadataEntries, ...remainingData] = numbers
+const calculateMetadataSum = ({ numbers, currentIndex = 0 }) => {
+  const numChildNodes = numbers[currentIndex]
+  const numMetadataEntries = numbers[currentIndex + 1]
 
   let numChildValues = 0
   let sumChildMetadata = 0
 
   for (let i = 0; i < numChildNodes; i++) {
-    const [_numChildValues, _sumChildMetadata] = calculateMetadataSum(
-      remainingData.slice(numChildValues)
-    )
+    const [_numChildValues, _sumChildMetadata] = calculateMetadataSum({
+      numbers,
+      currentIndex: currentIndex + 2 + numChildValues
+    })
 
     numChildValues += _numChildValues
     sumChildMetadata += _sumChildMetadata
   }
 
-  const parentMetadataValues = remainingData.slice(
-    numChildValues,
-    numChildValues + numMetadataEntries
-  )
+  const parentMetadataStart = currentIndex + 2 + numChildValues
+  const parentMetadataEnd = parentMetadataStart + numMetadataEntries
 
-  const sumParentMetadata = parentMetadataValues.reduce(
-    (total, curr) => total + curr
-  )
+  let sumParentMetadata = 0
+
+  for (let i = parentMetadataStart; i < parentMetadataEnd; i++) {
+    sumParentMetadata += numbers[i]
+  }
 
   return [
     2 + numChildValues + numMetadataEntries,
@@ -37,7 +39,7 @@ const input = fs.readFileSync(__dirname + '/input.txt', 'utf8')
 const solve = () => {
   const numbers = input.split(' ').map(Number)
 
-  const [_, total] = calculateMetadataSum(numbers)
+  const [_, total] = calculateMetadataSum({ numbers })
 
   console.log(total)
 }
