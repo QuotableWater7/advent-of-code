@@ -61,7 +61,7 @@ const parseEdges = line => {
 
 const solve = () => {
   const fileLines = fs
-    .readFileSync(__dirname + '/input.txt', 'utf8')
+    .readFileSync(__dirname + '/input2.txt', 'utf8')
     .split('\n')
     .filter(x => x.trim())
 
