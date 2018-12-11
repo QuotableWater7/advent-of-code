@@ -17,7 +17,7 @@ const parseVector = line => {
   }
 }
 
-const renderVectors = async ({ vectors, delay, iterations = 0 }) => {
+const renderVectors = async ({ vectors, iterations = 0 }) => {
   const canvas = createCanvas(500, 500)
   const ctx = canvas.getContext('2d')
 
@@ -43,7 +43,6 @@ const renderVectors = async ({ vectors, delay, iterations = 0 }) => {
       dx,
       dy
     })),
-    delay,
     iterations: iterations + 1
   })
 }
@@ -60,7 +59,7 @@ async function main() {
       dy
     }))
 
-  renderVectors({ vectors, delay: 300 })
+  renderVectors({ vectors })
 }
 
 main()
