@@ -1,3 +1,7 @@
+import System.IO
+import Control.Monad
+import Data.Typeable
+
 data Node = Null | Leaf [Int] | Parent [Node] [Int] deriving(Show)
 
 extractNChildren :: Int -> [Int] -> ([Node], [Int])
@@ -29,6 +33,11 @@ sumOfMetadata (Leaf list) = foldr (+) 0 list
 sumOfMetadata (Parent children metadata_values) = (foldr (+) 0 (map sumOfMetadata children)) + (foldr (+) 0 metadata_values)
 
 main = do
-  let (node, _) = parseIntoNode [2, 3, 0, 3, 10, 11, 12, 1, 1, 0, 1, 99, 2, 1, 1, 2]
+  handle <- openFile "/Users/josephbowler/Documents/practice/advent-of-code/problem_08/input.txt" ReadMode
+  contents <- hGetContents handle
+
+  let numbers = map read (words contents)
+
+  let (node, _) = parseIntoNode numbers
 
   print . sumOfMetadata $ node
