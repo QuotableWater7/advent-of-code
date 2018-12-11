@@ -13,7 +13,8 @@ extractNChildren n list = do
 
 parseIntoNode :: [Int] -> (Node, [Int])
 parseIntoNode (0:num_metadata_values:xs) = do
-  (Leaf (take num_metadata_values xs), drop num_metadata_values xs)
+  let (metadata_values, rest) = splitAt num_metadata_values xs
+  (Leaf metadata_values, rest)
 parseIntoNode [] = (Null, [])
 parseIntoNode (num_child_nodes:num_metadata_values:xs) = do
   let (children, rest) = extractNChildren num_child_nodes xs
