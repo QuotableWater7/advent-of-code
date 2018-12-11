@@ -2,26 +2,6 @@
 
 const fs = require('fs')
 
-const getNumberOfValues = ({ numbers, currentIndex }) => {
-  const numChildNodes = numbers[currentIndex]
-  const numMetadataEntries = numbers[currentIndex + 1]
-
-  if (numChildNodes === 0) {
-    return 2 + numMetadataEntries
-  }
-
-  let totalNumberChildValues = 0
-
-  for (let i = 0; i < numMetadataEntries; i++) {
-    totalNumberChildValues += getNumberOfValues({
-      numbers,
-      currentIndex: 2 + totalNumberOfChildValues
-    })
-  }
-
-  return 2 + totalNumberChildValues + numMetadataEntries
-}
-
 const calculateMetadataSum = ({ numbers, currentIndex = 0 }) => {
   const numChildNodes = numbers[currentIndex]
   const numMetadataEntries = numbers[currentIndex + 1]
