@@ -3,9 +3,8 @@ import System.IO
 data Node = Null | Leaf [Int] | Parent [Node] [Int] deriving(Show)
 
 extractNChildren :: Int -> [Int] -> ([Node], [Int])
-extractNChildren 1 list = do
-  let (node, remaining) = parseIntoNode list
-  ([node], remaining)
+extractNChildren 0 list = do
+  ([Null], list)
 extractNChildren n list = do
   let (node, remaining) = parseIntoNode list
   let (nodes, rest) = extractNChildren (n - 1) remaining
