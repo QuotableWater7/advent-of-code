@@ -1,6 +1,4 @@
 import System.IO
-import Control.Monad
-import Data.Typeable
 
 data Node = Null | Leaf [Int] | Parent [Node] [Int] deriving(Show)
 
@@ -8,21 +6,18 @@ extractNChildren :: Int -> [Int] -> ([Node], [Int])
 extractNChildren 1 list = do
   let (node, remaining) = parseIntoNode list
   ([node], remaining)
-
 extractNChildren n list = do
   let (node, remaining) = parseIntoNode list
   let (nodes, rest) = extractNChildren (n - 1) remaining
-
   (nodes ++ [node], rest)
 
 parseIntoNode :: [Int] -> (Node, [Int])
-parseIntoNode (0:numMetadataValues:xs) = do
-  (Leaf (take numMetadataValues xs), drop numMetadataValues xs)
+parseIntoNode (0:num_metadata_values:xs) = do
+  (Leaf (take num_metadata_values xs), drop num_metadata_values xs)
 parseIntoNode [] = (Null, [])
-parseIntoNode (numChildNodes:numMetadataValues:xs) = do
-  let (children, rest) = extractNChildren numChildNodes xs
-
-  let (metadata_values, remaining_input) = splitAt numMetadataValues rest
+parseIntoNode (num_child_nodes:num_metadata_values:xs) = do
+  let (children, rest) = extractNChildren num_child_nodes xs
+  let (metadata_values, remaining_input) = splitAt num_metadata_values rest
 
   ((Parent children metadata_values), remaining_input)
 
@@ -37,7 +32,5 @@ main = do
   contents <- hGetContents handle
 
   let numbers = map read (words contents)
-
   let (node, _) = parseIntoNode numbers
-
   print . sumOfMetadata $ node
