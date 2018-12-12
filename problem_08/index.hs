@@ -1,6 +1,6 @@
 import System.IO
 
-data Node = Node [Node] [Int] deriving(Show)
+data Node = Node [Node] [Int]
 
 extractNChildren :: Int -> [Int] -> ([Node], [Int])
 extractNChildren 0 list = do
