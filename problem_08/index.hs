@@ -1,10 +1,10 @@
 import System.IO
 
-data Node = Null | Leaf [Int] | Parent [Node] [Int] deriving(Show)
+data Node = Leaf [Int] | Parent [Node] [Int] deriving(Show)
 
 extractNChildren :: Int -> [Int] -> ([Node], [Int])
 extractNChildren 0 list = do
-  ([Null], list)
+  ([Leaf []], list)
 extractNChildren n list = do
   let (node, remaining) = parseIntoNode list
   let (nodes, rest) = extractNChildren (n - 1) remaining
@@ -14,7 +14,7 @@ parseIntoNode :: [Int] -> (Node, [Int])
 parseIntoNode (0:num_metadata_values:xs) = do
   let (metadata_values, rest) = splitAt num_metadata_values xs
   (Leaf metadata_values, rest)
-parseIntoNode [] = (Null, [])
+parseIntoNode [] = (Leaf [], [])
 parseIntoNode (num_child_nodes:num_metadata_values:xs) = do
   let (children, rest) = extractNChildren num_child_nodes xs
   let (metadata_values, remaining_input) = splitAt num_metadata_values rest
@@ -22,7 +22,6 @@ parseIntoNode (num_child_nodes:num_metadata_values:xs) = do
   ((Parent children metadata_values), remaining_input)
 
 sumOfMetadata :: Node -> Int
-sumOfMetadata Null = 0
 sumOfMetadata (Leaf list) = foldr (+) 0 list
 sumOfMetadata (Parent children metadata_values) = (foldr (+) 0 (map sumOfMetadata children)) + (foldr (+) 0 metadata_values)
 
