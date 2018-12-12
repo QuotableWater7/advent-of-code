@@ -1,10 +1,10 @@
 import System.IO
 
-data Node = Leaf [Int] | Parent [Node] [Int] deriving(Show)
+data Node = Node [Node] [Int] deriving(Show)
 
 extractNChildren :: Int -> [Int] -> ([Node], [Int])
 extractNChildren 0 list = do
-  ([Leaf []], list)
+  ([Node [] []], list)
 extractNChildren n list = do
   let (node, remaining) = parseIntoNode list
   let (nodes, rest) = extractNChildren (n - 1) remaining
@@ -13,17 +13,16 @@ extractNChildren n list = do
 parseIntoNode :: [Int] -> (Node, [Int])
 parseIntoNode (0:num_metadata_values:xs) = do
   let (metadata_values, rest) = splitAt num_metadata_values xs
-  (Leaf metadata_values, rest)
-parseIntoNode [] = (Leaf [], [])
+  (Node [] metadata_values, rest)
+parseIntoNode [] = (Node [] [], [])
 parseIntoNode (num_child_nodes:num_metadata_values:xs) = do
   let (children, rest) = extractNChildren num_child_nodes xs
   let (metadata_values, remaining_input) = splitAt num_metadata_values rest
 
-  ((Parent children metadata_values), remaining_input)
+  ((Node children metadata_values), remaining_input)
 
 sumOfMetadata :: Node -> Int
-sumOfMetadata (Leaf list) = foldr (+) 0 list
-sumOfMetadata (Parent children metadata_values) = (foldr (+) 0 (map sumOfMetadata children)) + (foldr (+) 0 metadata_values)
+sumOfMetadata (Node children metadata_values) = (foldr (+) 0 (map sumOfMetadata children)) + (foldr (+) 0 metadata_values)
 
 main = do
   handle <- openFile "/Users/josephbowler/Documents/practice/advent-of-code/problem_08/input.txt" ReadMode
