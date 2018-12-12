@@ -23,7 +23,6 @@ parseIntoNode (num_child_nodes:num_metadata_values:xs) = do
 
 sumOfMetadata :: Node -> Int
 sumOfMetadata Null = 0
-sumOfMetadata (Leaf []) = 0
 sumOfMetadata (Leaf list) = foldr (+) 0 list
 sumOfMetadata (Parent children metadata_values) = (foldr (+) 0 (map sumOfMetadata children)) + (foldr (+) 0 metadata_values)
 
