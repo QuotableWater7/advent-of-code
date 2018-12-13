@@ -1,3 +1,5 @@
+import System.IO
+
 data Rule = Rule { configuration :: [Char], next_state :: Char }
 
 -- map over a list, but each iteration of map provides n items from the list
@@ -23,41 +25,17 @@ calculateConfiguration rules 0 list = list
 calculateConfiguration rules numGenerations list = do
   calculateConfiguration rules (numGenerations - 1) (chunkMap 5 (applyMatchingRule rules) (".." ++ list ++ ".."))
 
-main = do
-  let rules = [Rule {configuration = ".###.", next_state = '#'},
-               Rule {configuration = "#.##.", next_state = '.'},
-               Rule {configuration = ".#.##", next_state = '#'},
-               Rule {configuration = "...##", next_state = '.'},
-               Rule {configuration = "###.#", next_state = '#'},
-               Rule {configuration = "##.##", next_state = '.'},
-               Rule {configuration = ".....", next_state = '.'},
-               Rule {configuration = "#..#.", next_state = '#'},
-               Rule {configuration = "..#..", next_state = '#'},
-               Rule {configuration = "#.###", next_state = '#'},
-               Rule {configuration = "##.#.", next_state = '.'},
-               Rule {configuration = "..#.#", next_state = '#'},
-               Rule {configuration = "#.#.#", next_state = '#'},
-               Rule {configuration = ".##.#", next_state = '#'},
-               Rule {configuration = ".#..#", next_state = '#'},
-               Rule {configuration = "#..##", next_state = '#'},
-               Rule {configuration = "##..#", next_state = '#'},
-               Rule {configuration = "#...#", next_state = '.'},
-               Rule {configuration = "...#.", next_state = '#'},
-               Rule {configuration = "#####", next_state = '.'},
-               Rule {configuration = "###..", next_state = '#'},
-               Rule {configuration = "#.#..", next_state = '.'},
-               Rule {configuration = "....#", next_state = '.'},
-               Rule {configuration = ".####", next_state = '#'},
-               Rule {configuration = "..###", next_state = '.'},
-               Rule {configuration = "..##.", next_state = '#'},
-               Rule {configuration = ".##..", next_state = '.'},
-               Rule {configuration = "#....", next_state = '.'},
-               Rule {configuration = "####.", next_state = '#'},
-               Rule {configuration = ".#.#.", next_state = '.'},
-               Rule {configuration = ".#...", next_state = '#'},
-               Rule {configuration = "##...", next_state = '#'}]
+parseRule :: [Char] -> Rule
+parseRule letters = do
+  Rule { configuration = take 5 letters, next_state = last letters }
 
-  let input = "##.######...#.##.#...#...##.####..###.#.##.#.##...##..#...##.#..##....##...........#.#.#..###.#"
+main = do
+  handle <- openFile "/Users/josephbowler/Documents/practice/advent-of-code/problem_12/input.txt" ReadMode
+  contents <- hGetContents handle
+  let file_lines = lines contents
+
+  let input = snd . (splitAt 15) . head $ file_lines
+  let rules = (map parseRule) . snd . (splitAt 2) $ file_lines
 
   let output = calculateConfiguration rules 20 input
 
