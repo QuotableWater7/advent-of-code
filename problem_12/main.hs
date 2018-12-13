@@ -1,17 +1,60 @@
-data Rule = Rule { l2 :: Char, l1 :: Char, c :: Char, r1 :: Char, r2 :: Char, next_state :: Char } deriving (Show)
+data Rule = Rule { configuration :: [Char], next_state :: Char }
 
-data Rules = Rules [Rule] deriving (Show)
+chunkMap :: Int -> ([a] -> a) -> [a] -> [a]
+chunkMap n fn [] = []
+chunkMap n fn list
+  | (length list) > n = (fn (take n list)) : (chunkMap n fn (tail list))
+  | otherwise = [fn list]
 
-data PlantConfiguration = PlantConfiguration [Char] deriving (Show)
+applyMatchingRule :: [Rule] -> [Char] -> Char
+applyMatchingRule [] plants = (head . (drop 2)) plants
+applyMatchingRule ((Rule configuration next_state):rule_tail) plants =
+  if configuration == plants
+    then next_state
+    else applyMatchingRule rule_tail plants
 
-calculateNextState :: Rules -> PlantConfiguration -> PlantConfiguration
-calculateNextState rules input = do
-  input
+calculateConfiguration :: [Rule] -> Int -> [Char] -> [Char]
+calculateConfiguration rules 0 list = list
+calculateConfiguration rules numGenerations list = do
+  calculateConfiguration rules (numGenerations - 1) (chunkMap 5 (applyMatchingRule rules) (".." ++ list ++ ".."))
 
 main = do
-  let input = PlantConfiguration "#..#.#..##......###...###"
-  let rules = Rules [Rule { l2 = '.', l1 = '#', c = '#', r1 = '#', r2 = '.', next_state = '#' }]
+  let rules = [Rule {configuration = ".###.", next_state = '#'},
+               Rule {configuration = "#.##.", next_state = '.'},
+               Rule {configuration = ".#.##", next_state = '#'},
+               Rule {configuration = "...##", next_state = '.'},
+               Rule {configuration = "###.#", next_state = '#'},
+               Rule {configuration = "##.##", next_state = '.'},
+               Rule {configuration = ".....", next_state = '.'},
+               Rule {configuration = "#..#.", next_state = '#'},
+               Rule {configuration = "..#..", next_state = '#'},
+               Rule {configuration = "#.###", next_state = '#'},
+               Rule {configuration = "##.#.", next_state = '.'},
+               Rule {configuration = "..#.#", next_state = '#'},
+               Rule {configuration = "#.#.#", next_state = '#'},
+               Rule {configuration = ".##.#", next_state = '#'},
+               Rule {configuration = ".#..#", next_state = '#'},
+               Rule {configuration = "#..##", next_state = '#'},
+               Rule {configuration = "##..#", next_state = '#'},
+               Rule {configuration = "#...#", next_state = '.'},
+               Rule {configuration = "...#.", next_state = '#'},
+               Rule {configuration = "#####", next_state = '.'},
+               Rule {configuration = "###..", next_state = '#'},
+               Rule {configuration = "#.#..", next_state = '.'},
+               Rule {configuration = "....#", next_state = '.'},
+               Rule {configuration = ".####", next_state = '#'},
+               Rule {configuration = "..###", next_state = '.'},
+               Rule {configuration = "..##.", next_state = '#'},
+               Rule {configuration = ".##..", next_state = '.'},
+               Rule {configuration = "#....", next_state = '.'},
+               Rule {configuration = "####.", next_state = '#'},
+               Rule {configuration = ".#.#.", next_state = '.'},
+               Rule {configuration = ".#...", next_state = '#'},
+               Rule {configuration = "##...", next_state = '#'}]
 
-  let next_state = calculateNextState rules input
+  let input = "##.######...#.##.#...#...##.####..###.#.##.#.##...##..#...##.#..##....##...........#.#.#..###.#"
 
-  print next_state
+  let output = calculateConfiguration rules 20 input
+
+  print input
+  print output
