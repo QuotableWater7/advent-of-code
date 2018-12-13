@@ -2,21 +2,21 @@ import System.IO
 
 data Node = Node [Node] [Int]
 
-extractNChildren :: Int -> [Int] -> ([Node], [Int])
-extractNChildren 0 list = do
+parseChildrenNodes :: Int -> [Int] -> ([Node], [Int])
+parseChildrenNodes 0 list = do
   ([Node [] []], list)
-extractNChildren n list = do
-  let (node, remaining) = parseIntoNode list
-  let (nodes, rest) = extractNChildren (n - 1) remaining
+parseChildrenNodes n list = do
+  let (node, remaining) = parseNode list
+  let (nodes, rest) = parseChildrenNodes (n - 1) remaining
   (nodes ++ [node], rest)
 
-parseIntoNode :: [Int] -> (Node, [Int])
-parseIntoNode (0:num_metadata_values:xs) = do
+parseNode :: [Int] -> (Node, [Int])
+parseNode (0:num_metadata_values:xs) = do
   let (metadata_values, rest) = splitAt num_metadata_values xs
   (Node [] metadata_values, rest)
-parseIntoNode [] = (Node [] [], [])
-parseIntoNode (num_child_nodes:num_metadata_values:xs) = do
-  let (children, rest) = extractNChildren num_child_nodes xs
+parseNode [] = (Node [] [], [])
+parseNode (num_child_nodes:num_metadata_values:xs) = do
+  let (children, rest) = parseChildrenNodes num_child_nodes xs
   let (metadata_values, remaining_input) = splitAt num_metadata_values rest
 
   ((Node children metadata_values), remaining_input)
@@ -29,5 +29,5 @@ main = do
   contents <- hGetContents handle
 
   let numbers = map read (words contents)
-  let (node, _) = parseIntoNode numbers
+  let (node, _) = parseNode numbers
   print . sumOfMetadata $ node
