@@ -2,108 +2,44 @@
 
 const fs = require('fs')
 
-const calculateMetadataSum = ({ numbers, currentIndex = 0 }) => {
-  const numChildNodes = numbers[currentIndex]
-  const numMetadataEntries = numbers[currentIndex + 1]
-
-  let numChildValues = 0
-  let sumChildMetadata = 0
-
-  for (let i = 0; i < numChildNodes; i++) {
-    const [_numChildValues, _sumChildMetadata] = calculateMetadataSum({
-      numbers,
-      currentIndex: currentIndex + 2 + numChildValues
-    })
-
-    numChildValues += _numChildValues
-    sumChildMetadata += _sumChildMetadata
+const createChildrenNodes = n => numbers => {
+  if (n === 0) {
+    return [[{ children: [], metadataValues: [] }], numbers]
   }
 
-  const parentMetadataStart = currentIndex + 2 + numChildValues
-  const parentMetadataEnd = parentMetadataStart + numMetadataEntries
+  const [node, remaining] = createNodes(numbers)
+  const [nodes, rest] = createChildrenNodes(n - 1)(remaining)
 
-  let sumParentMetadata = 0
-
-  for (let i = parentMetadataStart; i < parentMetadataEnd; i++) {
-    sumParentMetadata += numbers[i]
-  }
-
-  return [
-    2 + numChildValues + numMetadataEntries,
-    sumChildMetadata + sumParentMetadata
-  ]
+  return [[node, ...nodes], rest]
 }
 
-const calculateMetadataSumBetter = ({ numbers }) => {
-  const numChildNodes = numbers[currentIndex]
-  const numMetadataEntries = numbers[currentIndex + 1]
+const createNodes = numbers => {
+  const [numChildren, numMetadataValues, ...rest] = numbers
 
-  let numChildValues = 0
-  let sumChildMetadata = 0
+  if (numChildren === 0) {
+    const metadataValues = rest.slice(0, numMetadataValues)
+    const remaining = rest.slice(numMetadataValues)
 
-  for (let i = 0; i < numChildNodes; i++) {
-    const [_numChildValues, _sumChildMetadata] = calculateMetadataSum({
-      numbers,
-      currentIndex: currentIndex + 2 + numChildValues
-    })
-
-    numChildValues += _numChildValues
-    sumChildMetadata += _sumChildMetadata
+    return [{ children: [], metadataValues }, remaining]
   }
 
-  const parentMetadataStart = currentIndex + 2 + numChildValues
-  const parentMetadataEnd = parentMetadataStart + numMetadataEntries
+  const [children, remaining2] = createChildrenNodes(numChildren)(rest)
+  const metadataValues = remaining2.slice(0, numMetadataValues)
 
-  let sumParentMetadata = 0
-
-  for (let i = parentMetadataStart; i < parentMetadataEnd; i++) {
-    sumParentMetadata += numbers[i]
-  }
-
-  return [
-    2 + numChildValues + numMetadataEntries,
-    sumChildMetadata + sumParentMetadata
-  ]
+  return [{ children, metadataValues }, remaining2.slice(numMetadataValues)]
 }
 
-const calculateMetadataSumPart2 = ({ numbers, currentIndex = 0 }) => {
-  const numChildNodes = numbers[currentIndex]
-  const numMetadataEntries = numbers[currentIndex + 1]
-
-  let numChildValues = 0
-  let sumChildMetadata = 0
-
-  let childValues = [0]
-
-  for (let i = 0; i < numChildNodes; i++) {
-    const [_numChildValues, _sumChildMetadata] = calculateMetadataSumPart2({
-      numbers,
-      currentIndex: currentIndex + 2 + numChildValues
-    })
-
-    numChildValues += _numChildValues
-    sumChildMetadata += _sumChildMetadata
-
-    childValues.push(_sumChildMetadata)
-  }
-
-  const parentMetadataStart = currentIndex + 2 + numChildValues
-  const parentMetadataEnd = parentMetadataStart + numMetadataEntries
-
-  const parentMetadataValues = numbers.slice(
-    parentMetadataStart,
-    parentMetadataEnd
+const sumMetadataValues = node => {
+  return (
+    node.children.reduce(
+      (childrenTotal, child) => childrenTotal + sumMetadataValues(child),
+      0
+    ) +
+    node.metadataValues.reduce(
+      (parentTotal, metadataValue) => parentTotal + metadataValue,
+      0
+    )
   )
-
-  const value =
-    numChildNodes > 0
-      ? parentMetadataValues.reduce(
-          (total, currentIndex) => total + (childValues[currentIndex] || 0),
-          0
-        )
-      : parentMetadataValues.reduce((total, value) => total + value)
-
-  return [2 + numChildValues + numMetadataEntries, value]
 }
 
 const input = fs.readFileSync(__dirname + '/input.txt', 'utf8')
@@ -113,9 +49,9 @@ const input2 = '2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2'
 const solve = () => {
   const numbers = input.split(' ').map(Number)
 
-  const [_, total] = calculateMetadataSumPart2({ numbers })
+  const [node, _] = createNodes(numbers)
 
-  console.log(total)
+  console.log(sumMetadataValues(node))
 }
 
 solve()
