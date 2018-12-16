@@ -2,9 +2,16 @@
 
 const fs = require('fs')
 
+const makeNode = ({ children, metadataValues }) => ({
+  children,
+  metadataValues
+})
+
 const createChildrenNodes = n => numbers => {
   if (n === 0) {
-    return [[{ children: [], metadataValues: [] }], numbers]
+    const node = makeNode({ children: [], metadataValues: [] })
+
+    return [[node], numbers]
   }
 
   const [node, remaining] = createNodes(numbers)
@@ -20,13 +27,16 @@ const createNodes = numbers => {
     const metadataValues = rest.slice(0, numMetadataValues)
     const remaining = rest.slice(numMetadataValues)
 
-    return [{ children: [], metadataValues }, remaining]
+    return [makeNode({ children: [], metadataValues }), remaining]
   }
 
   const [children, remaining2] = createChildrenNodes(numChildren)(rest)
   const metadataValues = remaining2.slice(0, numMetadataValues)
 
-  return [{ children, metadataValues }, remaining2.slice(numMetadataValues)]
+  return [
+    makeNode({ children, metadataValues }),
+    remaining2.slice(numMetadataValues)
+  ]
 }
 
 const sumMetadataValues = node => {
