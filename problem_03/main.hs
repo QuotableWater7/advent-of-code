@@ -14,7 +14,7 @@ main = do
 
   let tags = words contents
   let occurrences = map (countOccurrences . sort) tags
-  let with2 = (length . (filter id) . (map (any (\(ch, numOccurrences) -> numOccurrences == 2)))) occurrences
-  let with3 = (length . (filter id) . (map (any (\(ch, numOccurrences) -> numOccurrences == 3)))) occurrences
+  let with2 = (length . (filter (any (\(ch, numOccurrences) -> numOccurrences == 2)))) occurrences
+  let with3 = (length . (filter (any (\(ch, numOccurrences) -> numOccurrences == 3)))) occurrences
 
   print (with2 * with3)
