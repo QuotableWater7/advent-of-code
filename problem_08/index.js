@@ -52,6 +52,16 @@ const sumMetadataValues = node => {
   )
 }
 
+const sumMetadataValuesPart2 = node => {
+  return node.children.length > 0
+    ? node.metadataValues.reduce((total, childIndex) => {
+        const child = node.children[childIndex - 1]
+
+        return total + (child ? sumMetadataValuesPart2(child) : 0)
+      }, 0)
+    : sumMetadataValues(node)
+}
+
 const input = fs.readFileSync(__dirname + '/input.txt', 'utf8')
 
 const input2 = '2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2'
@@ -62,6 +72,7 @@ const solve = () => {
   const [node, _] = createNodes(numbers)
 
   console.log(sumMetadataValues(node))
+  console.log(sumMetadataValuesPart2(node))
 }
 
 solve()
