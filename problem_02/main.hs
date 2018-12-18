@@ -14,6 +14,13 @@ numListsWithCharCount n list = (length . (filter (any (\(ch, numOccurrences) -> 
 checksum :: [[(Char, Int)]] -> Int
 checksum list = (numListsWithCharCount 2 list) * (numListsWithCharCount 3 list)
 
+numDifferent :: [a] -> [a] -> Int
+numDifferent [] list = length list
+numDifferent list [] = length list
+numDifferent (x:xy) (y:yy) =
+  | x == y = numDifferent xy yy
+  | otherwise = 1 + numDifferent xy yy
+
 main = do
   handle <- openFile "/Users/josephbowler/Documents/practice/advent-of-code/problem_03/input.txt" ReadMode
   contents <- hGetContents handle
